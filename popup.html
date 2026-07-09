@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoClicker Pro</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Background Gradient Orbs -->
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+
+    <!-- Countdown Overlay -->
+    <div class="countdown-overlay" id="countdownOverlay">
+      <div class="countdown-content">
+        <div class="countdown-number" id="countdownNumber">3</div>
+        <div class="countdown-text">Starting replay...</div>
+        <button class="countdown-cancel" id="countdownCancel">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="13" stroke="url(#logo-grad)" stroke-width="2"/>
+            <circle cx="14" cy="14" r="5" fill="url(#logo-grad)"/>
+            <path d="M14 1 L14 5 M14 23 L14 27 M1 14 L5 14 M23 14 L27 14" stroke="url(#logo-grad)" stroke-width="1.5" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="logo-grad" x1="0" y1="0" x2="28" y2="28">
+                <stop offset="0%" stop-color="#818cf8"/>
+                <stop offset="100%" stop-color="#c084fc"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="header-info">
+          <h1>AutoClicker Pro</h1>
+          <p class="subtitle">Record &amp; Replay</p>
+        </div>
+      </div>
+      <div class="status-badge" id="statusBadge">
+        <span class="status-dot"></span>
+        <span class="status-text">Idle</span>
+      </div>
+    </header>
+
+    <!-- Main Controls -->
+    <section class="controls-section glass-card">
+      <div class="controls-row">
+        <button class="btn btn-record" id="btnRecord" title="Start Recording (Alt+Shift+R)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="7" fill="currentColor"/>
+          </svg>
+          <span>Record</span>
+        </button>
+        <button class="btn btn-stop" id="btnStop" title="Stop" disabled>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="3" y="3" width="12" height="12" rx="2" fill="currentColor"/>
+          </svg>
+          <span>Stop</span>
+        </button>
+        <button class="btn btn-pause" id="btnPause" title="Pause/Resume Replay" disabled>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" class="pause-icon">
+            <rect x="4" y="3" width="3.5" height="12" rx="1" fill="currentColor"/>
+            <rect x="10.5" y="3" width="3.5" height="12" rx="1" fill="currentColor"/>
+          </svg>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" class="resume-icon" style="display:none">
+            <path d="M4 2.5L15.5 9L4 15.5V2.5Z" fill="currentColor"/>
+          </svg>
+          <span class="pause-label">Pause</span>
+        </button>
+        <button class="btn btn-play" id="btnPlay" title="Start Replay (Alt+Shift+P)" disabled>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M4 2.5L15.5 9L4 15.5V2.5Z" fill="currentColor"/>
+          </svg>
+          <span>Play</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Replay Settings -->
+    <section class="settings-section glass-card">
+      <h2 class="section-title">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M2 4L8 1L14 4V12L8 15L2 12V4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        Replay Settings
+      </h2>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label class="setting-label">Repeat Count</label>
+          <div class="repeat-control">
+            <button class="btn-icon" id="btnRepeatMinus" title="Decrease">
+              <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <input type="number" class="repeat-input" id="repeatCount" value="1" min="1" max="999">
+            <button class="btn-icon" id="btnRepeatPlus" title="Increase">
+              <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7h8M7 3v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <button class="btn-infinite" id="btnInfinite" title="Infinite loop">∞</button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label class="setting-label">Speed</label>
+          <div class="speed-selector">
+            <button class="speed-btn" data-speed="0.25">0.25x</button>
+            <button class="speed-btn" data-speed="0.5">0.5x</button>
+            <button class="speed-btn active" data-speed="1">1x</button>
+            <button class="speed-btn" data-speed="2">2x</button>
+            <button class="speed-btn" data-speed="5">5x</button>
+            <button class="speed-btn" data-speed="10">10x</button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label class="setting-label">Start Delay</label>
+          <div class="delay-control">
+            <input type="number" class="delay-input" id="startDelay" value="0" min="0" max="10" step="1">
+            <span class="delay-unit">sec</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Replay Progress -->
+    <section class="progress-section glass-card" id="progressSection" style="display: none;">
+      <div class="progress-header">
+        <span class="progress-label" id="progressLabel">Replaying...</span>
+        <span class="progress-iter" id="progressIter">1/1</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </section>
+
+    <!-- Auto-Click Mode -->
+    <section class="autoclick-section glass-card">
+      <h2 class="section-title">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M6 1L6 10L9.5 7.5L12.5 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9.5 7.5L13 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Auto-Click Mode
+      </h2>
+      <div class="autoclick-desc">Click automatically at cursor position</div>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label class="setting-label">Interval</label>
+          <div class="interval-control">
+            <input type="number" class="interval-input" id="clickInterval" value="1000" min="50" max="60000" step="50">
+            <span class="interval-unit">ms</span>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label class="setting-label">Click Type</label>
+          <div class="click-type-selector">
+            <button class="click-type-btn active" data-type="click">Left</button>
+            <button class="click-type-btn" data-type="dblclick">Double</button>
+            <button class="click-type-btn" data-type="contextmenu">Right</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-autoclick" id="btnAutoClick">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M6 1L6 10L9.5 7.5L12.5 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Start Auto-Click</span>
+      </button>
+    </section>
+
+    <!-- Recordings List -->
+    <section class="recordings-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M5 1v4M11 1v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Recordings
+        </h2>
+        <div class="header-actions">
+          <button class="header-action-btn" id="btnExport" title="Export All">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 1v8M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M1 10v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button class="header-action-btn" id="btnImport" title="Import">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 9V1M3 5l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M1 10v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button class="header-action-btn danger" id="btnClearAll" title="Clear All">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 4h10M5 4V3h4v1M3 4v8a1 1 0 001 1h6a1 1 0 001-1V4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <span class="recording-count" id="recordingCount">0</span>
+        </div>
+      </div>
+      <div class="recordings-list" id="recordingsList">
+        <div class="empty-state" id="emptyState">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.1)" stroke-width="2" stroke-dasharray="4 4"/>
+            <circle cx="24" cy="24" r="8" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+            <path d="M24 16v16M16 24h16" stroke="rgba(255,255,255,0.1)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <p>No recordings yet</p>
+          <span>Click Record to start capturing</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="fileImport" accept=".json" style="display:none">
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="hotkey-hints">
+        <div class="hotkey">
+          <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>
+          <span>Record</span>
+        </div>
+        <div class="hotkey">
+          <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>
+          <span>Play</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+    <!-- Rules/Event Editor Modal -->
+    <div class="modal-overlay" id="rulesModal">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <h3>Edit Action Rules (If/Else)</h3>
+          <button class="modal-close" id="rulesModalClose">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">Set conditional execution rules for each recorded action. Skipped actions will be bypassed during replay.</p>
+          <div class="events-list" id="rulesEventsList">
+            <!-- Events populated dynamically -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" id="btnCancelRules">Cancel</button>
+          <button class="btn" id="btnSaveRules" style="border-color: rgba(34, 197, 94, 0.3); background: rgba(34, 197, 94, 0.08); color: var(--play-color);">Save Rules</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generate Icons</title></head>
+<body>
+<h2>AutoClicker Pro — Icon Generator</h2>
+<p>Right-click each icon and "Save Image As..." to the icons/ folder</p>
+<div id="icons" style="display:flex;gap:20px;align-items:end;padding:20px;background:#111;"></div>
+<script>
+const sizes = [16, 48, 128];
+const container = document.getElementById('icons');
+
+sizes.forEach(size => {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const c = size / 2;
+  const s = size / 128;
+
+  // Background
+  const grad = ctx.createLinearGradient(0, 0, size, size);
+  grad.addColorStop(0, '#6366f1');
+  grad.addColorStop(1, '#8b5cf6');
+  ctx.beginPath();
+  ctx.arc(c, c, c * 0.88, 0, Math.PI * 2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Ring
+  ctx.beginPath();
+  ctx.arc(c, c, c * 0.55, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+  ctx.lineWidth = Math.max(1, 2 * s);
+  ctx.stroke();
+
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(c, c, c * 0.22, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+
+  // Crosshair
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+  ctx.lineWidth = Math.max(1, 1.5 * s);
+  ctx.lineCap = 'round';
+  [[c, c*0.12, c, c*0.38], [c, c*1.62, c, c*1.88],
+   [c*0.12, c, c*0.38, c], [c*1.62, c, c*1.88, c]].forEach(([x1,y1,x2,y2]) => {
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  });
+
+  const div = document.createElement('div');
+  div.style.textAlign = 'center';
+  div.innerHTML = `<p style="color:#fff;font-family:sans-serif">${size}x${size}</p>`;
+  
+  // Convert to downloadable link
+  const link = document.createElement('a');
+  link.download = `icon${size}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.appendChild(canvas);
+  link.style.display = 'block';
+  div.appendChild(link);
+  
+  // Auto-download
+  const btn = document.createElement('button');
+  btn.textContent = `Download icon${size}.png`;
+  btn.style.cssText = 'margin-top:8px;padding:4px 12px;cursor:pointer';
+  btn.onclick = () => {
+    const a = document.createElement('a');
+    a.download = `icon${size}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+  div.appendChild(btn);
+  
+  container.appendChild(div);
+});
+</script>
+</body>
+</html>

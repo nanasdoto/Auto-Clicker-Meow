@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoClicker Test Page</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 40px;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      gap: 20px;
+    }
+    .card {
+      background: #313244;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      text-align: center;
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    button {
+      background: #89b4fa;
+      color: #11111b;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      width: 100%;
+    }
+    button:hover {
+      background: #b4befe;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    #counter {
+      font-size: 40px;
+      font-weight: bold;
+      color: #a6e3a1;
+    }
+    .log-container {
+      background: #181825;
+      padding: 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 11px;
+      max-height: 120px;
+      overflow-y: auto;
+      text-align: left;
+    }
+    .scroll-container {
+      max-height: 100px;
+      overflow-y: auto;
+      background: #181825;
+      border-radius: 6px;
+      padding: 5px;
+      text-align: left;
+    }
+    .scroll-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid #313244;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .scroll-item:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .dynamic-area {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+      border: 1px dashed rgba(255,255,255,0.1);
+      font-size: 13px;
+    }
+    #dynamicTarget {
+      background: #f38ba8;
+      color: #11111b;
+      font-weight: bold;
+      padding: 4px 12px;
+      border-radius: 4px;
+      animation: fadeIn 0.3s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Click & Scroll Test</h2>
+    <div id="counter">0</div>
+    <button id="clickBtn">Click Me!</button>
+
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
+      <span style="font-size: 12px; color: #a6e3a1;">Nested Card Button:</span>
+      <button class="pick r-epic" id="nestedBtn" style="display: flex; align-items: center; gap: 8px; margin-top: 4px; text-align: left; background: #cba6f7;">
+        <span class="pk-art"><img src="https://via.placeholder.com/24" style="border-radius: 4px; display: block;"></span>
+        <div>
+          <div class="pk-nm" style="font-weight: bold;">Tectodon</div>
+          <div class="pk-sub" style="font-size: 11px; opacity: 0.8;">Epic · Lv17</div>
+        </div>
+      </button>
+    </div>
+
+    <div>
+      <span style="font-size: 12px; color: #a6e3a1;">Scrollable Container:</span>
+      <div class="scroll-container" id="scrollContainer">
+        <div class="scroll-item">Scroll Item 1</div>
+        <div class="scroll-item">Scroll Item 2</div>
+        <div class="scroll-item">Scroll Item 3</div>
+        <div class="scroll-item">Scroll Item 4</div>
+        <div class="scroll-item">Scroll Item 5</div>
+      </div>
+    </div>
+
+    <div>
+      <span style="font-size: 12px; color: #a6e3a1;">Conditional Rules Sandbox:</span>
+      <div style="display: flex; gap: 6px; margin: 4px 0;">
+        <button id="btnToggleElement" style="background: #a6e3a1; font-size: 12px; padding: 6px 12px;">Toggle Element</button>
+        <button id="btnToggleText" style="background: #fab387; font-size: 12px; padding: 6px 12px;">Toggle Status Text</button>
+      </div>
+      <div class="dynamic-area">
+        <div id="dynamicContainer"></div>
+      </div>
+      <div style="font-size: 12px; margin-top: 4px;">
+        Status: <span id="statusLabel" style="font-weight: bold; color: #f9e2af;">Inactive</span>
+      </div>
+    </div>
+
+    <div class="log-container" id="log">Logs will appear here...</div>
+  </div>
+
+  <script>
+    const clickBtn = document.getElementById('clickBtn');
+    const nestedBtn = document.getElementById('nestedBtn');
+    const counterEl = document.getElementById('counter');
+    const logEl = document.getElementById('log');
+    const scrollContainer = document.getElementById('scrollContainer');
+    const btnToggleElement = document.getElementById('btnToggleElement');
+    const btnToggleText = document.getElementById('btnToggleText');
+    const dynamicContainer = document.getElementById('dynamicContainer');
+    const statusLabel = document.getElementById('statusLabel');
+
+    let count = 0;
+
+    function addLog(msg) {
+      const div = document.createElement('div');
+      div.textContent = msg;
+      logEl.appendChild(div);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    clickBtn.addEventListener('click', (e) => {
+      count++;
+      counterEl.textContent = count;
+      addLog(`[Click Me!] Count: ${count}`);
+    });
+
+    nestedBtn.addEventListener('click', (e) => {
+      count += 5;
+      counterEl.textContent = count;
+      addLog(`[Nested Tectodon] Count +5: ${count}`);
+    });
+
+    // Add click handlers to scroll items
+    document.querySelectorAll('.scroll-item').forEach((item, idx) => {
+      item.addEventListener('click', () => {
+        count += (idx + 1);
+        counterEl.textContent = count;
+        addLog(`[Scroll Item ${idx + 1}] Count +${idx + 1}: ${count}`);
+      });
+    });
+
+    // Scroll listener log
+    scrollContainer.addEventListener('scroll', () => {
+      addLog(`[Scroll] top: ${scrollContainer.scrollTop}`);
+    });
+
+    // Toggle target element
+    btnToggleElement.addEventListener('click', () => {
+      const existing = document.getElementById('dynamicTarget');
+      if (existing) {
+        existing.remove();
+        addLog(`[Toggle] Removed #dynamicTarget`);
+      } else {
+        const target = document.createElement('div');
+        target.id = 'dynamicTarget';
+        target.textContent = 'Target Found!';
+        dynamicContainer.appendChild(target);
+        addLog(`[Toggle] Added #dynamicTarget`);
+      }
+    });
+
+    // Toggle status text
+    btnToggleText.addEventListener('click', () => {
+      const current = statusLabel.textContent;
+      if (current === 'Active') {
+        statusLabel.textContent = 'Inactive';
+        statusLabel.style.color = '#f9e2af';
+        addLog(`[Toggle] Status -> Inactive`);
+      } else {
+        statusLabel.textContent = 'Active';
+        statusLabel.style.color = '#a6e3a1';
+        addLog(`[Toggle] Status -> Active`);
+      }
+    });
+  </script>
+</body>
+</html>
