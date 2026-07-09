@@ -39,7 +39,7 @@ Since this extension is currently in development, you can install it locally via
 
 1. Download or clone this repository:
    ```bash
-   git clone [https://github.com/nanasdoto/clickflow.git](https://github.com/nanasdoto/clickflow.git)
+   gh repo clone nanasdoto/clickflow
    ```
 2. Open Google Chrome and navigate to chrome://extensions/.
 3. Enable Developer mode by toggling the switch in the top-right corner.
