@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "AutoClicker Pro — Record & Replay",
+  "name": "Auto Clicker Meow",
   "version": "1.0.0",
   "description": "Record mouse clicks and keyboard actions, then replay them with customizable repeat count and speed.",
   "permissions": [

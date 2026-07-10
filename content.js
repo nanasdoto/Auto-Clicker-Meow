@@ -1,4 +1,4 @@
-// AutoClicker Pro — Content Script
+// Auto Clicker Meow — Content Script
 // Handles event recording, replay (with pause/resume), and auto-click on web pages
 
 (() => {

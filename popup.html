@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoClicker Pro</title>
+  <title>Auto Clicker Meow</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -27,19 +27,49 @@
       <div class="header-left">
         <div class="logo">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <circle cx="14" cy="14" r="13" stroke="url(#logo-grad)" stroke-width="2"/>
-            <circle cx="14" cy="14" r="5" fill="url(#logo-grad)"/>
-            <path d="M14 1 L14 5 M14 23 L14 27 M1 14 L5 14 M23 14 L27 14" stroke="url(#logo-grad)" stroke-width="1.5" stroke-linecap="round"/>
-            <defs>
-              <linearGradient id="logo-grad" x1="0" y1="0" x2="28" y2="28">
-                <stop offset="0%" stop-color="#818cf8"/>
-                <stop offset="100%" stop-color="#c084fc"/>
-              </linearGradient>
-            </defs>
+            <!-- Background (White) -->
+            <circle cx="14" cy="14" r="14" fill="#ffffff"/>
+            <!-- Ears -->
+            <!-- Left Ear Background (Orange) -->
+            <path d="M5 11 L4 4 L11 8 Z" fill="#f97316" stroke="#1e293b" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- Left Ear Inner -->
+            <path d="M6.5 9.5 L5.8 5.5 L9.5 8 Z" fill="#fee2e2"/>
+            
+            <!-- Right Ear Background (Black) -->
+            <path d="M23 11 L24 4 L17 8 Z" fill="#1e293b" stroke="#1e293b" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- Right Ear Inner -->
+            <path d="M21.5 9.5 L22.2 5.5 L18.5 8 Z" fill="#fee2e2"/>
+
+            <!-- Head Base (White) -->
+            <path d="M4 14 C4 9 24 9 24 14 C24 20 21 23 14 23 C7 23 4 20 4 14 Z" fill="#ffffff" stroke="#1e293b" stroke-width="1.5" stroke-linejoin="round"/>
+            
+            <!-- Orange Spot on Face (Left Side) -->
+            <path d="M4.1 14 C4.1 11.5 8 11.5 10 14 C11.5 16 9 19 4.8 17.5 C4.3 16.4 4.1 15.2 4.1 14 Z" fill="#f97316"/>
+            
+            <!-- Black Spot on Face (Right Side) -->
+            <path d="M23.9 14 C23.9 11.5 20 11.5 18 14 C16.5 16 19 19 23.2 17.5 C23.7 16.4 23.9 15.2 23.9 14 Z" fill="#1e293b"/>
+
+            <!-- Smile Eyes -->
+            <!-- Left Smile Eye (Black) -->
+            <path d="M8 14 C9 13 10 13 11 14" stroke="#1e293b" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- Right Smile Eye (White against Black Spot) -->
+            <path d="M17 14 C18 13 19 13 20 14" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+
+            <!-- Nose & Smile Mouth -->
+            <path d="M14 16 L14 17.2 C13.5 17.5 12.8 17.8 12.2 17.5 M14 17.2 C14.5 17.5 15.2 17.8 15.8 17.5" stroke="#1e293b" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <polygon points="13.2,15.5 14.8,15.5 14,16.2" fill="#ef4444"/>
+
+            <!-- Whiskers -->
+            <!-- Left Whiskers -->
+            <line x1="2" y1="16" x2="6" y2="16.5" stroke="#1e293b" stroke-width="1" stroke-linecap="round"/>
+            <line x1="2" y1="18" x2="5.5" y2="18" stroke="#1e293b" stroke-width="1" stroke-linecap="round"/>
+            <!-- Right Whiskers -->
+            <line x1="26" y1="16" x2="22" y2="16.5" stroke="#1e293b" stroke-width="1" stroke-linecap="round"/>
+            <line x1="26" y1="18" x2="22.5" y2="18" stroke="#1e293b" stroke-width="1" stroke-linecap="round"/>
           </svg>
         </div>
         <div class="header-info">
-          <h1>AutoClicker Pro</h1>
+          <h1>Auto Clicker Meow</h1>
           <p class="subtitle">Record &amp; Replay</p>
         </div>
       </div>

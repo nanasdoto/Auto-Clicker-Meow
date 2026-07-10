@@ -1,4 +1,4 @@
-// AutoClicker Pro — Popup Script
+// Auto Clicker Meow — Popup Script
 // Handles UI interactions, messaging with background, and recording management
 
 document.addEventListener('DOMContentLoaded', async () => {

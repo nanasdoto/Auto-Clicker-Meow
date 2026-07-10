@@ -1,4 +1,4 @@
-/* ─── AutoClicker Pro — Popup Styles ─── */
+/* ─── Auto Clicker Meow — Popup Styles ─── */
 /* Dark Glassmorphism Theme with Purple/Indigo Accent */
 
 /* ─── Reset & Base ─── */
@@ -255,11 +255,11 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: logoSpin 20s linear infinite;
+  animation: logoPurr 3.5s ease-in-out infinite;
 }
-@keyframes logoSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes logoPurr {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08) rotate(3deg); }
 }
 .header-info h1 {
   font-size: 16px;

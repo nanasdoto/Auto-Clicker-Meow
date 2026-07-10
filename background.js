@@ -1,4 +1,4 @@
-// AutoClicker Pro — Background Service Worker
+// Auto Clicker Meow — Background Service Worker
 // Manages state, message routing, storage, and keyboard shortcuts
 
 let state = {
