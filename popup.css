@@ -40,8 +40,8 @@
   --transition-slow: 0.35s ease;
 
   --bg-input: rgba(10, 10, 26, 0.8);
-  --bg-overlay: rgba(10, 10, 26, 0.75);
-  --bg-countdown: rgba(10, 10, 26, 0.96);
+  --bg-overlay: rgba(10, 10, 26, 0.35);
+  --bg-countdown: rgba(10, 10, 26, 0.4);
   --shadow-modal: 0 16px 40px rgba(0, 0, 0, 0.5);
   --bg-row: rgba(255, 255, 255, 0.015);
   --orb-1-bg: rgba(99, 102, 241, 0.12);
@@ -73,8 +73,8 @@ html[data-theme="light"] {
   --danger-color: #dc2626;
 
   --bg-input: rgba(255, 255, 255, 0.85);
-  --bg-overlay: rgba(241, 245, 249, 0.75);
-  --bg-countdown: rgba(241, 245, 249, 0.96);
+  --bg-overlay: rgba(241, 245, 249, 0.35);
+  --bg-countdown: rgba(241, 245, 249, 0.4);
   --shadow-modal: 0 16px 40px rgba(15, 23, 42, 0.12);
   --bg-row: rgba(15, 23, 42, 0.015);
   --orb-1-bg: rgba(99, 102, 241, 0.05);
@@ -166,8 +166,8 @@ html, body {
   inset: 0;
   z-index: 100;
   background: var(--bg-countdown);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   align-items: center;
   justify-content: center;
   flex-direction: column;
@@ -1059,8 +1059,8 @@ kbd {
   inset: 0;
   z-index: 150;
   background: var(--bg-overlay);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   align-items: center;
   justify-content: center;
   padding: 16px;
