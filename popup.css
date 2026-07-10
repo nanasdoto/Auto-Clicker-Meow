@@ -632,52 +632,6 @@ html, body {
   font-weight: 500;
 }
 
-/* ─── Progress Section ─── */
-.progress-section {
-  padding: 12px 14px;
-  animation: slideDown 0.3s ease;
-}
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.progress-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--play-color);
-}
-.progress-label.paused {
-  color: var(--pause-color);
-}
-.progress-iter {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-}
-.progress-bar-container {
-  height: 4px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-}
-.progress-bar {
-  height: 100%;
-  width: 0%;
-  border-radius: 4px;
-  background: linear-gradient(90deg, var(--play-color), #4ade80);
-  transition: width 0.4s ease;
-  box-shadow: 0 0 10px var(--play-glow);
-}
-
 /* ─── Auto-Click Section ─── */
 .autoclick-section {
   padding: 14px;

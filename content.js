@@ -15,6 +15,7 @@
   let recordingStartTime = 0;
   let replayTimeouts = [];
   let overlay = null;
+  let overlayPos = null;
 
   // Pause/Resume state
   let pausedReplayData = null; // { recording, config, iteration }
@@ -220,12 +221,88 @@
 
     btnPause.addEventListener('click', (e) => {
       e.stopPropagation();
-      togglePauseRecording();
+      if (isRecording) {
+        togglePauseRecording();
+      } else if (isReplaying || isPaused) {
+        if (isPaused) {
+          chrome.runtime.sendMessage({ action: 'resumeReplay' });
+        } else {
+          chrome.runtime.sendMessage({ action: 'pauseReplay' });
+        }
+      }
     });
 
     btnStop.addEventListener('click', (e) => {
       e.stopPropagation();
-      stopRecording();
+      if (isRecording) {
+        stopRecording();
+      } else if (isReplaying || isPaused) {
+        chrome.runtime.sendMessage({ action: 'stopReplay' });
+      }
+    });
+
+    // ─── Drag and Drop Logic ───
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let overlayStartX = 0;
+    let overlayStartY = 0;
+
+    const statusBar = overlay.querySelector('.__ac-status-bar');
+
+    statusBar.addEventListener('pointerdown', (e) => {
+      // Only drag with left mouse button click
+      if (e.button !== 0) return;
+      // Do not initiate drag if clicking control buttons
+      if (e.target.closest('.__ac-controls')) return;
+
+      isDragging = true;
+      statusBar.style.cursor = 'grabbing';
+
+      const rect = overlay.getBoundingClientRect();
+      overlayStartX = rect.left;
+      overlayStartY = rect.top;
+
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+
+      overlay.style.right = 'auto';
+      overlay.style.left = `${overlayStartX}px`;
+      overlay.style.top = `${overlayStartY}px`;
+
+      statusBar.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+
+    statusBar.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+
+      let newLeft = overlayStartX + dx;
+      let newTop = overlayStartY + dy;
+
+      const rect = overlay.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Keep inside bounds with 8px margin
+      newLeft = Math.max(8, Math.min(newLeft, viewportWidth - rect.width - 8));
+      newTop = Math.max(8, Math.min(newTop, viewportHeight - rect.height - 8));
+
+      overlay.style.left = `${newLeft}px`;
+      overlay.style.top = `${newTop}px`;
+      
+      // Save position to state
+      overlayPos = { left: newLeft, top: newTop };
+    });
+
+    statusBar.addEventListener('pointerup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      statusBar.style.cursor = 'grab';
+      statusBar.releasePointerCapture(e.pointerId);
     });
 
     const style = document.createElement('style');
@@ -258,6 +335,9 @@
         font-size: 13px;
         font-weight: 500;
         transition: all 0.3s ease;
+        cursor: grab;
+        pointer-events: auto;
+        user-select: none;
       }
       .__ac-dot {
         width: 8px;
@@ -352,6 +432,20 @@
 
     document.documentElement.appendChild(style);
     document.documentElement.appendChild(overlay);
+
+    // Apply last saved position if it exists
+    if (overlayPos) {
+      const rect = overlay.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const left = Math.max(8, Math.min(overlayPos.left, viewportWidth - rect.width - 8));
+      const top = Math.max(8, Math.min(overlayPos.top, viewportHeight - rect.height - 8));
+
+      overlay.style.right = 'auto';
+      overlay.style.left = `${left}px`;
+      overlay.style.top = `${top}px`;
+    }
+
     return overlay;
   }
 
@@ -361,6 +455,10 @@
     const text = overlay.querySelector('.__ac-status-text');
     const count = overlay.querySelector('.__ac-event-count');
     const controls = overlay.querySelector('.__ac-controls');
+    const btnPause = overlay.querySelector('.__ac-btn-pause');
+    const btnStop = overlay.querySelector('.__ac-btn-stop');
+    const iconPause = btnPause.querySelector('.__ac-icon-pause');
+    const iconResume = btnPause.querySelector('.__ac-icon-resume');
 
     dot.className = '__ac-dot';
     if (status === 'recording') {
@@ -368,16 +466,34 @@
       dot.classList.add('recording');
       text.textContent = isRecordingPaused ? '⏸ Paused' : '● Recording';
       text.style.color = isRecordingPaused ? '#f59e0b' : '#ef4444';
+      btnStop.title = 'Stop Recording';
+      if (isRecordingPaused) {
+        iconPause.style.display = 'none';
+        iconResume.style.display = '';
+        btnPause.title = 'Resume Recording';
+      } else {
+        iconPause.style.display = '';
+        iconResume.style.display = 'none';
+        btnPause.title = 'Pause Recording';
+      }
     } else if (status === 'replaying') {
-      controls.style.display = 'none';
+      controls.style.display = 'flex';
       dot.classList.add('replaying');
       text.textContent = '▶ Replaying';
       text.style.color = '#22c55e';
+      btnStop.title = 'Stop Replay';
+      iconPause.style.display = '';
+      iconResume.style.display = 'none';
+      btnPause.title = 'Pause Replay';
     } else if (status === 'paused') {
-      controls.style.display = 'none';
+      controls.style.display = 'flex';
       dot.classList.add('paused');
       text.textContent = '⏸ Paused';
       text.style.color = '#f59e0b';
+      btnStop.title = 'Stop Replay';
+      iconPause.style.display = 'none';
+      iconResume.style.display = '';
+      btnPause.title = 'Resume Replay';
     } else if (status === 'autoclicking') {
       controls.style.display = 'none';
       dot.classList.add('autoclicking');

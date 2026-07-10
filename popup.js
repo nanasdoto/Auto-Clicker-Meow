@@ -16,10 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const startDelayInput = document.getElementById('startDelay');
   const recordingsList = document.getElementById('recordingsList');
   const recordingCount = document.getElementById('recordingCount');
-  const progressSection = document.getElementById('progressSection');
-  const progressBar = document.getElementById('progressBar');
-  const progressIter = document.getElementById('progressIter');
-  const progressLabel = document.getElementById('progressLabel');
 
   // Auto-Click elements
   const btnAutoClick = document.getElementById('btnAutoClick');
@@ -57,6 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let selectedRecordingId = null;
   let currentClickType = 'click';
   let countdownTimer = null;
+  let lastRepeatCount = 1;
 
   // ─── Initialize ───
   const state = await sendMessage({ action: 'getState' });
@@ -96,7 +93,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         setPauseMode(false);
         btnPlay.disabled = true;
         btnAutoClick.disabled = true;
-        progressSection.style.display = 'none';
         break;
 
       case 'recording-paused':
@@ -109,7 +105,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         setPauseMode(true);
         btnPlay.disabled = true;
         btnAutoClick.disabled = true;
-        progressSection.style.display = 'none';
         break;
 
       case 'replaying':
@@ -123,9 +118,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnPlay.classList.add('active');
         btnPlay.disabled = true;
         btnAutoClick.disabled = true;
-        progressSection.style.display = 'block';
-        progressLabel.textContent = 'Replaying...';
-        progressLabel.classList.remove('paused');
         break;
 
       case 'paused':
@@ -139,9 +131,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnPlay.classList.remove('active');
         btnPlay.disabled = true;
         btnAutoClick.disabled = true;
-        progressSection.style.display = 'block';
-        progressLabel.textContent = 'Paused';
-        progressLabel.classList.add('paused');
         break;
 
       case 'autoclicking':
@@ -155,7 +144,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnPlay.classList.remove('active');
         btnAutoClick.classList.add('active');
         btnAutoClick.querySelector('span').textContent = 'Stop Auto-Click';
-        progressSection.style.display = 'none';
         break;
 
       default: // idle
@@ -170,7 +158,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnAutoClick.classList.remove('active');
         btnAutoClick.querySelector('span').textContent = 'Start Auto-Click';
         btnAutoClick.disabled = false;
-        progressSection.style.display = 'none';
         break;
     }
   }
@@ -261,8 +248,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (result.success) {
       updateUI({ status: 'replaying' });
-      progressIter.textContent = isInfinite ? '1/∞' : `1/${config.repeatCount}`;
-      progressBar.style.width = '0%';
     }
   }
 
@@ -297,15 +282,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ─── Repeat Count Controls ───
   btnRepeatMinus.addEventListener('click', () => {
-    if (isInfinite) return;
+    if (isInfinite) {
+      isInfinite = false;
+      btnInfinite.classList.remove('active');
+      repeatCountInput.classList.remove('infinite');
+      repeatCountInput.disabled = false;
+      const newVal = Math.max(1, lastRepeatCount - 1);
+      repeatCountInput.value = newVal;
+      lastRepeatCount = newVal;
+      return;
+    }
     const val = parseInt(repeatCountInput.value) || 1;
-    repeatCountInput.value = Math.max(1, val - 1);
+    const newVal = Math.max(1, val - 1);
+    repeatCountInput.value = newVal;
+    lastRepeatCount = newVal;
   });
 
   btnRepeatPlus.addEventListener('click', () => {
-    if (isInfinite) return;
+    if (isInfinite) {
+      isInfinite = false;
+      btnInfinite.classList.remove('active');
+      repeatCountInput.classList.remove('infinite');
+      repeatCountInput.disabled = false;
+      const newVal = Math.min(999, lastRepeatCount + 1);
+      repeatCountInput.value = newVal;
+      lastRepeatCount = newVal;
+      return;
+    }
     const val = parseInt(repeatCountInput.value) || 1;
-    repeatCountInput.value = Math.min(999, val + 1);
+    const newVal = Math.min(999, val + 1);
+    repeatCountInput.value = newVal;
+    lastRepeatCount = newVal;
   });
 
   repeatCountInput.addEventListener('change', () => {
@@ -313,19 +320,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (isNaN(val) || val < 1) val = 1;
     if (val > 999) val = 999;
     repeatCountInput.value = val;
+    lastRepeatCount = val;
   });
 
   btnInfinite.addEventListener('click', () => {
     isInfinite = !isInfinite;
     btnInfinite.classList.toggle('active', isInfinite);
     if (isInfinite) {
+      const val = parseInt(repeatCountInput.value);
+      if (!isNaN(val) && val >= 1) {
+        lastRepeatCount = val;
+      }
       repeatCountInput.value = '∞';
       repeatCountInput.classList.add('infinite');
       repeatCountInput.disabled = true;
-      btnRepeatMinus.disabled = true;
-      btnRepeatPlus.disabled = true;
+      btnRepeatMinus.disabled = false;
+      btnRepeatPlus.disabled = false;
     } else {
-      repeatCountInput.value = '1';
+      repeatCountInput.value = lastRepeatCount;
       repeatCountInput.classList.remove('infinite');
       repeatCountInput.disabled = false;
       btnRepeatMinus.disabled = false;
@@ -730,24 +742,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ─── Background Messages ───
   chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
       case 'stateChanged':
         updateUI(message.state);
         if (message.state.status === 'idle') {
           setTimeout(loadRecordings, 300);
-        }
-        break;
-      case 'replayProgress':
-        progressIter.textContent = `${message.iteration + 1}/${message.total}`;
-        if (message.total !== '∞') {
-          const pct = ((message.iteration + 1) / message.total) * 100;
-          progressBar.style.width = `${pct}%`;
-        } else {
-          // Infinite: cycle progress bar
-          progressBar.style.width = '100%';
-          setTimeout(() => { progressBar.style.width = '0%'; }, 400);
         }
         break;
     }
