@@ -441,10 +441,50 @@
         0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
         100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
       }
+
+      /* Light theme styling for overlay */
+      #__autoclicker-overlay[data-theme="light"] .__ac-status-bar {
+        background: rgba(241, 245, 249, 0.95);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        color: #0f172a;
+        box-shadow: 0 4px 24px rgba(15, 23, 42, 0.15);
+      }
+      #__autoclicker-overlay[data-theme="light"] .__ac-btn {
+        border-color: rgba(15, 23, 42, 0.12);
+        background: rgba(15, 23, 42, 0.05);
+        color: rgba(15, 23, 42, 0.7);
+      }
+      #__autoclicker-overlay[data-theme="light"] .__ac-btn:hover {
+        background: rgba(15, 23, 42, 0.1);
+        color: #0f172a;
+        border-color: rgba(15, 23, 42, 0.3);
+      }
+      #__autoclicker-overlay[data-theme="light"] .__ac-btn-pause:hover {
+        border-color: rgba(217, 119, 6, 0.4);
+        color: #d97706;
+        background: rgba(217, 119, 6, 0.1);
+      }
+      #__autoclicker-overlay[data-theme="light"] .__ac-btn-stop:hover {
+        border-color: rgba(220, 38, 38, 0.4);
+        color: #dc2626;
+        background: rgba(220, 38, 38, 0.1);
+      }
+      #__autoclicker-overlay[data-theme="light"] .__ac-event-count {
+        color: rgba(15, 23, 42, 0.5);
+      }
+      #__autoclicker-overlay[data-theme="light"] .__ac-controls {
+        border-left-color: rgba(15, 23, 42, 0.15);
+      }
     `;
 
     document.documentElement.appendChild(style);
     document.documentElement.appendChild(overlay);
+
+    // Set theme attribute from storage
+    chrome.storage.local.get('theme', (data) => {
+      const theme = data.theme || 'dark';
+      overlay.setAttribute('data-theme', theme);
+    });
 
     // Apply last saved position if it exists
     if (overlayPos) {

@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnPause = document.getElementById('btnPause');
   const btnPlay = document.getElementById('btnPlay');
   const statusBadge = document.getElementById('statusBadge');
+  const btnTheme = document.getElementById('btnTheme');
   const repeatCountInput = document.getElementById('repeatCount');
   const btnRepeatMinus = document.getElementById('btnRepeatMinus');
   const btnRepeatPlus = document.getElementById('btnRepeatPlus');
@@ -59,6 +60,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   const state = await sendMessage({ action: 'getState' });
   updateUI(state);
   await loadRecordings();
+
+  // ─── Theme Management ───
+  const sunIcon = btnTheme.querySelector('.sun-icon');
+  const moonIcon = btnTheme.querySelector('.moon-icon');
+
+  // Load saved theme
+  const storedTheme = await chrome.storage.local.get('theme');
+  const currentTheme = storedTheme.theme || 'dark';
+  setTheme(currentTheme);
+
+  btnTheme.addEventListener('click', () => {
+    const activeTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    setTheme(activeTheme);
+  });
+
+  function setTheme(theme) {
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      sunIcon.style.display = 'none';
+      moonIcon.style.display = 'block';
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      sunIcon.style.display = 'block';
+      moonIcon.style.display = 'none';
+    }
+    chrome.storage.local.set({ theme });
+  }
 
   // ─── Message Helper ───
   function sendMessage(msg) {
@@ -436,17 +464,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     fileImport.value = '';
   });
 
+  // ─── Custom Confirm Dialog ───
+  let confirmCallback = null;
+
+  function showCustomConfirm(title, message, onConfirm) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    confirmCallback = onConfirm;
+    document.getElementById('confirmModal').classList.add('active');
+  }
+
+  function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.remove('active');
+    confirmCallback = null;
+  }
+
+  document.getElementById('btnConfirmOk').addEventListener('click', () => {
+    if (confirmCallback) confirmCallback();
+    closeConfirmModal();
+  });
+
+  document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirmModal);
+  document.getElementById('confirmModalClose').addEventListener('click', closeConfirmModal);
+
   // ─── Clear All Recordings ───
   btnClearAll.addEventListener('click', async () => {
     const result = await sendMessage({ action: 'getRecordings' });
     const recordings = result.recordings || [];
     if (recordings.length === 0) return;
 
-    if (!confirm(`Delete all ${recordings.length} recording(s)? This cannot be undone.`)) return;
-
-    await sendMessage({ action: 'clearRecordings' });
-    selectedRecordingId = null;
-    await loadRecordings();
+    showCustomConfirm(
+      'Clear All Recordings',
+      `Delete all ${recordings.length} recording(s)? This cannot be undone.`,
+      async () => {
+        await sendMessage({ action: 'clearRecordings' });
+        selectedRecordingId = null;
+        await loadRecordings();
+      }
+    );
   });
 
   // ─── Load Recordings ───
