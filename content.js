@@ -16,6 +16,7 @@
   let replayTimeouts = [];
   let overlay = null;
   let overlayPos = null;
+  let lastReplayConfig = null;
 
   // Pause/Resume state
   let pausedReplayData = null; // { recording, config, iteration }
@@ -229,6 +230,12 @@
         } else {
           chrome.runtime.sendMessage({ action: 'pauseReplay' });
         }
+      } else if (lastReplayConfig) {
+        chrome.runtime.sendMessage({
+          action: 'startReplay',
+          recordingId: lastReplayConfig.recordingId,
+          config: lastReplayConfig.config
+        });
       }
     });
 
@@ -238,6 +245,8 @@
         stopRecording();
       } else if (isReplaying || isPaused) {
         chrome.runtime.sendMessage({ action: 'stopReplay' });
+      } else {
+        removeOverlay();
       }
     });
 
@@ -356,6 +365,10 @@
       }
       .__ac-dot.paused {
         background: #f59e0b;
+        animation: none;
+      }
+      .__ac-dot.stopped {
+        background: #ef4444;
         animation: none;
       }
       .__ac-dot.autoclicking {
@@ -494,6 +507,15 @@
       iconPause.style.display = 'none';
       iconResume.style.display = '';
       btnPause.title = 'Resume Replay';
+    } else if (status === 'stopped') {
+      controls.style.display = 'flex';
+      dot.classList.add('stopped');
+      text.textContent = '⏹ Stopped';
+      text.style.color = '#ef4444';
+      btnStop.title = 'Close Overlay';
+      iconPause.style.display = 'none';
+      iconResume.style.display = '';
+      btnPause.title = 'Play Replay';
     } else if (status === 'autoclicking') {
       controls.style.display = 'none';
       dot.classList.add('autoclicking');
@@ -755,6 +777,9 @@
     replayTimeouts = [];
     replayCompletedCount = 0;
 
+    // Store for restart
+    lastReplayConfig = { recordingId: recording.id, config };
+
     // Store for pause/resume
     pausedReplayData = { recording, config, iteration };
 
@@ -834,6 +859,11 @@
           pausedReplayData = null;
           replayCompletedCount = 0;
 
+          const isLastIteration = !config.infinite && (iteration === config.repeatCount - 1);
+          if (isLastIteration) {
+            updateOverlay('stopped', recording.events.length);
+          }
+
           // Notify background that this iteration is complete
           chrome.runtime.sendMessage({
             action: 'replayComplete',
@@ -872,8 +902,7 @@
     replayTimeouts = [];
     pausedReplayData = null;
     replayCompletedCount = 0;
-    updateOverlay('idle', 0);
-    setTimeout(removeOverlay, 1000);
+    updateOverlay('stopped', 0);
 
     chrome.runtime.sendMessage({ action: 'replayStopped' });
   }
