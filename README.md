@@ -1,5 +1,3 @@
-# Auto Clicker Meow
-
 # Auto Clicker Meow: Advanced Chrome Automation Extension
 
 A powerful, intuitive, and lightweight Google Chrome extension designed to automate repetitive browser tasks. Whether you need a simple macro clicker, a form-filler, or a complex automation workflow with conditional logic, this extension handles it all entirely within your browser.
