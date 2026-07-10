@@ -1011,13 +1011,31 @@ html, body {
 .footer {
   position: relative;
   z-index: 1;
-  padding: 6px 0 0;
+  padding: 6px 0 4px;
   border-top: 1px solid var(--border-color);
 }
 .hotkey-hints {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 16px;
+}
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--accent-light);
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 2px 6px;
+  transition: color var(--transition);
+  display: block;
+  margin: 6px auto 0;
+  text-align: center;
+  outline: none;
+}
+.btn-link:hover {
+  color: var(--accent);
 }
 .hotkey {
   display: flex;

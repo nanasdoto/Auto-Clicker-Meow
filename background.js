@@ -85,6 +85,19 @@ chrome.commands.onCommand.addListener(async (command) => {
     } else if (state.status === 'paused') {
       stopReplay(state.activeTabId);
     }
+  } else if (command === 'toggle-pause-resume') {
+    const targetTabId = tab.id || state.activeTabId;
+    if (targetTabId) {
+      if (state.status === 'replaying') {
+        await handleMessage({ action: 'pauseReplay' });
+      } else if (state.status === 'paused') {
+        await handleMessage({ action: 'resumeReplay' });
+      } else if (state.status === 'recording') {
+        await handleMessage({ action: 'pauseRecording' });
+      } else if (state.status === 'recording-paused') {
+        await handleMessage({ action: 'resumeRecording' });
+      }
+    }
   }
 });
 
@@ -323,20 +336,22 @@ async function handleMessage(message, sender) {
       if (state.replayIteration < maxRepeats && state.status === 'replaying') {
         // Start next iteration
         try {
-          chrome.tabs.sendMessage(tabId, {
+          await chrome.tabs.sendMessage(tabId, {
             action: 'startReplay',
             recording: message.recording,
             config: state.replayConfig,
             iteration: state.replayIteration
           });
           // Notify popup of progress
-          try {
-            chrome.runtime.sendMessage({
-              action: 'replayProgress',
-              iteration: state.replayIteration,
-              total: state.replayConfig.infinite ? '∞' : state.replayConfig.repeatCount
-            });
-          } catch (e) {}
+          chrome.runtime.sendMessage({
+            action: 'replayProgress',
+            iteration: state.replayIteration,
+            total: state.replayConfig.infinite ? '∞' : state.replayConfig.repeatCount
+          }, () => {
+            if (chrome.runtime.lastError) {
+              // Suppress connection warning when popup is closed
+            }
+          });
         } catch (e) {
           state.status = 'idle';
           updateBadge('idle');
@@ -370,7 +385,11 @@ async function handleMessage(message, sender) {
 
 // ─── Helper: Notify popup of state change ───
 function notifyPopup() {
-  try { chrome.runtime.sendMessage({ action: 'stateChanged', state: { ...state } }); } catch (e) {}
+  chrome.runtime.sendMessage({ action: 'stateChanged', state: { ...state } }, () => {
+    if (chrome.runtime.lastError) {
+      // Suppress connection warning when popup is closed
+    }
+  });
 }
 
 // ─── Recording Control ───

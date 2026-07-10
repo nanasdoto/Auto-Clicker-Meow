@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const countdownOverlay = document.getElementById('countdownOverlay');
   const countdownNumber = document.getElementById('countdownNumber');
   const countdownCancel = document.getElementById('countdownCancel');
+  const hotkeyHints = document.getElementById('hotkeyHints');
+  const btnCustomizeShortcuts = document.getElementById('btnCustomizeShortcuts');
 
   // Pause button sub-elements
   const pauseIcon = btnPause.querySelector('.pause-icon');
@@ -87,6 +89,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     chrome.storage.local.set({ theme });
   }
+
+  // ─── Keyboard Shortcuts Rendering & Navigation ───
+  async function loadShortcuts() {
+    try {
+      const commands = await chrome.commands.getAll();
+      hotkeyHints.innerHTML = '';
+
+      commands.forEach(cmd => {
+        let label = '';
+        if (cmd.name === 'toggle-recording') {
+          label = 'Record';
+          btnRecord.title = `Start Recording (${cmd.shortcut || 'Not Set'})`;
+        } else if (cmd.name === 'toggle-replay') {
+          label = 'Play';
+          btnPlay.title = `Start Replay (${cmd.shortcut || 'Not Set'})`;
+        } else if (cmd.name === 'toggle-pause-resume') {
+          label = 'Pause';
+        } else return;
+
+        const shortcut = cmd.shortcut || 'Not Set';
+        const parts = shortcut.split('+');
+        const kbdHtml = parts.map(part => `<kbd>${escapeHtml(part)}</kbd>`).join(' + ');
+
+        const hotkeyEl = document.createElement('div');
+        hotkeyEl.className = 'hotkey';
+        hotkeyEl.innerHTML = `
+          ${kbdHtml}
+          <span>${label}</span>
+        `;
+        hotkeyHints.appendChild(hotkeyEl);
+      });
+    } catch (e) {
+      console.error('Failed to load shortcuts:', e);
+    }
+  }
+
+  btnCustomizeShortcuts.addEventListener('click', () => {
+    chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+  });
+
+  await loadShortcuts();
 
   // ─── Message Helper ───
   function sendMessage(msg) {
@@ -343,7 +386,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     lastRepeatCount = newVal;
   });
 
+  repeatCountInput.addEventListener('input', () => {
+    if (isInfinite) return;
+    repeatCountInput.value = repeatCountInput.value.replace(/\D/g, '');
+  });
+
   repeatCountInput.addEventListener('change', () => {
+    if (isInfinite) return;
     let val = parseInt(repeatCountInput.value);
     if (isNaN(val) || val < 1) val = 1;
     if (val > 999) val = 999;

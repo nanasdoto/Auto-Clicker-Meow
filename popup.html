@@ -149,7 +149,7 @@
             <button class="btn-icon" id="btnRepeatMinus" title="Decrease">
               <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
-            <input type="number" class="repeat-input" id="repeatCount" value="1" min="1" max="999">
+            <input type="text" class="repeat-input" id="repeatCount" value="1">
             <button class="btn-icon" id="btnRepeatPlus" title="Increase">
               <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7h8M7 3v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
@@ -262,16 +262,10 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <div class="hotkey-hints">
-        <div class="hotkey">
-          <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>
-          <span>Record</span>
-        </div>
-        <div class="hotkey">
-          <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>
-          <span>Play</span>
-        </div>
+      <div class="hotkey-hints" id="hotkeyHints">
+        <!-- Populated dynamically -->
       </div>
+      <button class="btn-link" id="btnCustomizeShortcuts">Customize Shortcuts</button>
     </footer>
   </div>
 

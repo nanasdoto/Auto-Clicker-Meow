@@ -44,6 +44,12 @@
         "default": "Alt+Shift+P"
       },
       "description": "Start/Stop replay"
+    },
+    "toggle-pause-resume": {
+      "suggested_key": {
+        "default": "Alt+Shift+U"
+      },
+      "description": "Pause/Resume active recording or replay"
     }
   }
 }
